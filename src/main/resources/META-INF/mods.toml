@@ -1,0 +1,28 @@
+modLoader="javafml"
+loaderVersion="[36,)"
+license="https://creativecommons.org/licenses/by-nc-sa/4.0/"
+#issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/"
+[[mods]]
+modId="netherite_shulkers"
+version="${file.jarVersion}"
+displayName="Netherite Shulkers"
+#updateJSONURL="https://change.me.example.invalid/updates.json"
+#displayURL="https://change.me.to.your.mods.homepage.example.invalid/"
+logoFile="logo.png"
+credits="Suited Llama for Fabric version of this mod"
+authors="ephys"
+description='''
+Shulkerboxes upgrade that increases inventory space and makes the shulkerbox immune to fire.
+'''
+[[dependencies.netherite_shulkers]]
+    modId="forge"
+    mandatory=true
+    versionRange="[36,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.netherite_shulkers]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.16.5,1.17)"
+    ordering="NONE"
+    side="BOTH"
