@@ -1,6 +1,5 @@
 package be.ephys.netherite_shulkers;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.material.PushReaction;
@@ -12,7 +11,6 @@ import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ShulkerBoxContainer;
-import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -29,8 +27,6 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -67,7 +63,7 @@ public class NetheriteShulkerBoxTileEntity extends LockableLootTileEntity implem
 
   protected void updateAnimation() {
     this.progressOld = this.progress;
-    switch(this.animationStatus) {
+    switch (this.animationStatus) {
       case CLOSED:
         this.progress = 0.0F;
         break;
@@ -104,29 +100,29 @@ public class NetheriteShulkerBoxTileEntity extends LockableLootTileEntity implem
 
   public AxisAlignedBB getBoundingBox(Direction p_190587_1_) {
     float f = this.getProgress(1.0F);
-    return VoxelShapes.block().bounds().expandTowards((double)(0.5F * f * (float)p_190587_1_.getStepX()), (double)(0.5F * f * (float)p_190587_1_.getStepY()), (double)(0.5F * f * (float)p_190587_1_.getStepZ()));
+    return VoxelShapes.block().bounds().expandTowards(0.5F * f * (float) p_190587_1_.getStepX(), 0.5F * f * (float) p_190587_1_.getStepY(), 0.5F * f * (float) p_190587_1_.getStepZ());
   }
 
   private AxisAlignedBB getTopBoundingBox(Direction p_190588_1_) {
     Direction direction = p_190588_1_.getOpposite();
-    return this.getBoundingBox(p_190588_1_).contract((double)direction.getStepX(), (double)direction.getStepY(), (double)direction.getStepZ());
+    return this.getBoundingBox(p_190588_1_).contract(direction.getStepX(), direction.getStepY(), direction.getStepZ());
   }
 
   private void moveCollidedEntities() {
     BlockState blockstate = this.level.getBlockState(this.getBlockPos());
-    if (blockstate.getBlock() instanceof ShulkerBoxBlock) {
+    if (blockstate.getBlock() instanceof NetheriteShulkerBoxBlock) {
       Direction direction = blockstate.getValue(ShulkerBoxBlock.FACING);
       AxisAlignedBB axisalignedbb = this.getTopBoundingBox(direction).move(this.worldPosition);
-      List<Entity> list = this.level.getEntities((Entity)null, axisalignedbb);
+      List<Entity> list = this.level.getEntities(null, axisalignedbb);
       if (!list.isEmpty()) {
-        for(int i = 0; i < list.size(); ++i) {
+        for (int i = 0; i < list.size(); ++i) {
           Entity entity = list.get(i);
           if (entity.getPistonPushReaction() != PushReaction.IGNORE) {
             double d0 = 0.0D;
             double d1 = 0.0D;
             double d2 = 0.0D;
             AxisAlignedBB axisalignedbb1 = entity.getBoundingBox();
-            switch(direction.getAxis()) {
+            switch (direction.getAxis()) {
               case X:
                 if (direction.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
                   d0 = axisalignedbb.maxX - axisalignedbb1.minX;
@@ -155,7 +151,7 @@ public class NetheriteShulkerBoxTileEntity extends LockableLootTileEntity implem
                 d2 = d2 + 0.01D;
             }
 
-            entity.move(MoverType.SHULKER_BOX, new Vector3d(d0 * (double)direction.getStepX(), d1 * (double)direction.getStepY(), d2 * (double)direction.getStepZ()));
+            entity.move(MoverType.SHULKER_BOX, new Vector3d(d0 * (double) direction.getStepX(), d1 * (double) direction.getStepY(), d2 * (double) direction.getStepZ()));
           }
         }
 
@@ -199,10 +195,9 @@ public class NetheriteShulkerBoxTileEntity extends LockableLootTileEntity implem
       ++this.openCount;
       this.level.blockEvent(this.worldPosition, this.getBlockState().getBlock(), 1, this.openCount);
       if (this.openCount == 1) {
-        this.level.playSound((PlayerEntity)null, this.worldPosition, SoundEvents.SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 0.5F, this.level.random.nextFloat() * 0.1F + 0.9F);
+        this.level.playSound(null, this.worldPosition, SoundEvents.SHULKER_BOX_OPEN, SoundCategory.BLOCKS, 0.5F, this.level.random.nextFloat() * 0.1F + 0.9F);
       }
     }
-
   }
 
   public void stopOpen(PlayerEntity p_174886_1_) {
@@ -210,7 +205,7 @@ public class NetheriteShulkerBoxTileEntity extends LockableLootTileEntity implem
       --this.openCount;
       this.level.blockEvent(this.worldPosition, this.getBlockState().getBlock(), 1, this.openCount);
       if (this.openCount <= 0) {
-        this.level.playSound((PlayerEntity)null, this.worldPosition, SoundEvents.SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 0.5F, this.level.random.nextFloat() * 0.1F + 0.9F);
+        this.level.playSound(null, this.worldPosition, SoundEvents.SHULKER_BOX_CLOSE, SoundCategory.BLOCKS, 0.5F, this.level.random.nextFloat() * 0.1F + 0.9F);
       }
     }
 
@@ -258,8 +253,8 @@ public class NetheriteShulkerBoxTileEntity extends LockableLootTileEntity implem
     return SLOTS;
   }
 
-  public boolean canPlaceItemThroughFace(int p_180462_1_, ItemStack p_180462_2_, @Nullable Direction p_180462_3_) {
-    return !(Block.byItem(p_180462_2_.getItem()) instanceof ShulkerBoxBlock);
+  public boolean canPlaceItemThroughFace(int slot, ItemStack itemStack, @Nullable Direction face) {
+    return ShulkerDenyList.isInsertableInShulkerBox(itemStack);
   }
 
   public boolean canTakeItemThroughFace(int p_180461_1_, ItemStack p_180461_2_, Direction p_180461_3_) {
@@ -270,14 +265,8 @@ public class NetheriteShulkerBoxTileEntity extends LockableLootTileEntity implem
     return MathHelper.lerp(p_190585_1_, this.progressOld, this.progress);
   }
 
-  @Nullable
-  @OnlyIn(Dist.CLIENT)
-  public DyeColor getColor() {
-    return null;
-  }
-
-  protected Container createMenu(int p_213906_1_, PlayerInventory p_213906_2_) {
-    return new ShulkerBoxContainer(p_213906_1_, p_213906_2_, this);
+  protected Container createMenu(int menuId, PlayerInventory playerInventory) {
+    return new ShulkerBoxContainer(menuId, playerInventory, this);
   }
 
   public boolean isClosed() {
