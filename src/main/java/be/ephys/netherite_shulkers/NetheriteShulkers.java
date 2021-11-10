@@ -61,6 +61,7 @@ public class NetheriteShulkers {
       new Item.Properties()
         .tab(ItemGroup.TAB_DECORATIONS)
         .fireResistant()
+        .stacksTo(1)
     )
   );
 
