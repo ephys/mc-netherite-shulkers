@@ -5,12 +5,14 @@ import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
+import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.RegistryObject;
@@ -29,6 +31,7 @@ public class NetheriteShulkers {
   public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, NetheriteShulkers.MODID);
   public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, NetheriteShulkers.MODID);
   public static final DeferredRegister<TileEntityType<?>> TILE_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, NetheriteShulkers.MODID);
+  public static final DeferredRegister<ContainerType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, NetheriteShulkers.MODID);
 
   public static final RegistryObject<Block> NETHERITE_SHULKER_BOX_BLOCK = BLOCKS.register("netherite_shulker_box", () ->
     shulkerBox(
@@ -69,12 +72,19 @@ public class NetheriteShulkers {
     TileEntityType.Builder.of(NetheriteShulkerBoxTileEntity::new, NETHERITE_SHULKER_BOX_BLOCK.get()).build(null)
   );
 
+  public static final RegistryObject<ContainerType<NetheriteShulkerBoxContainer>> NETHERITE_SHULKER_BOX_CONTAINER = CONTAINERS.register("netherite_shulker_box", () -> {
+    return IForgeContainerType.create((pWindowID, pInventory, pData) -> {
+      return new NetheriteShulkerBoxContainer(pWindowID, pInventory);
+    });
+  });
+
   public NetheriteShulkers() {
     IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
     BLOCKS.register(modEventBus);
     ITEMS.register(modEventBus);
     TILE_ENTITY_TYPES.register(modEventBus);
+    CONTAINERS.register(modEventBus);
 
     DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> Client::clientInit);
   }

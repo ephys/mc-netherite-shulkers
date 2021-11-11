@@ -10,7 +10,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ShulkerBoxContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.state.properties.BlockStateProperties;
@@ -33,8 +32,10 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 public class NetheriteShulkerBoxTileEntity extends LockableLootTileEntity implements ISidedInventory, ITickableTileEntity {
-  private static final int[] SLOTS = IntStream.range(0, 54).toArray();
-  private NonNullList<ItemStack> itemStacks = NonNullList.withSize(54, ItemStack.EMPTY);
+  public static final int INVENTORY_SIZE = 54;
+
+  private static final int[] SLOTS = IntStream.range(0, INVENTORY_SIZE).toArray();
+  private NonNullList<ItemStack> itemStacks = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
   private int openCount;
   private ShulkerBoxTileEntity.AnimationStatus animationStatus = ShulkerBoxTileEntity.AnimationStatus.CLOSED;
   private float progress;
@@ -266,7 +267,7 @@ public class NetheriteShulkerBoxTileEntity extends LockableLootTileEntity implem
   }
 
   protected Container createMenu(int menuId, PlayerInventory playerInventory) {
-    return new ShulkerBoxContainer(menuId, playerInventory, this);
+    return new NetheriteShulkerBoxContainer(menuId, playerInventory, this);
   }
 
   public boolean isClosed() {

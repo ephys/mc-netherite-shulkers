@@ -1,5 +1,7 @@
 package be.ephys.netherite_shulkers;
 
+import net.minecraft.block.GrassBlock;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -19,6 +21,11 @@ public class Client {
     ClientRegistry.bindTileEntityRenderer(
       NetheriteShulkers.NETHERITE_SHULKER_BOX_TILE_ENTITY.get(),
       NetheriteShulkerBoxTileEntityRenderer::new
+    );
+
+    ScreenManager.register(
+      NetheriteShulkers.NETHERITE_SHULKER_BOX_CONTAINER.get(),
+      NetheriteShulkerBoxScreen::new
     );
   }
 }
