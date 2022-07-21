@@ -1,9 +1,12 @@
 package be.ephys.netherite_shulkers;
 
+import be.ephys.netherite_shulkers.capabilities.ItemStackHelperItemHandlerProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -12,7 +15,9 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.extensions.IForgeMenuType;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -85,7 +90,27 @@ public class NetheriteShulkers {
     TILE_ENTITY_TYPES.register(modEventBus);
     CONTAINERS.register(modEventBus);
 
+    MinecraftForge.EVENT_BUS.addGenericListener(ItemStack.class, NetheriteShulkers::onAttachItemStackCapabilities);
+
     DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> Client::clientInit);
+  }
+
+  public static void onAttachItemStackCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
+    ItemStack stack = event.getObject();
+    Item item = stack.getItem();
+
+    if (!(item instanceof BlockItem blockItem)) {
+      return;
+    }
+
+    if (!(blockItem.getBlock() instanceof NetheriteShulkerBoxBlock)) {
+      return;
+    }
+
+    event.addCapability(
+      new ResourceLocation(NetheriteShulkers.MODID, "shulker_box_item_handler_value"),
+      new ItemStackHelperItemHandlerProvider(stack)
+    );
   }
 
   public static ResourceLocation id(String id) {

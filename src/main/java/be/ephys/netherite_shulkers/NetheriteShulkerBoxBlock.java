@@ -9,7 +9,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
@@ -28,7 +27,10 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -51,8 +53,6 @@ import java.util.List;
 public class NetheriteShulkerBoxBlock extends BaseEntityBlock {
   public static final EnumProperty<Direction> FACING = DirectionalBlock.FACING;
   public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
-
-  public static final ResourceLocation CONTENTS = new ResourceLocation("contents");
 
   public NetheriteShulkerBoxBlock(Properties p_i48334_2_) {
     super(p_i48334_2_);
@@ -149,19 +149,41 @@ public class NetheriteShulkerBoxBlock extends BaseEntityBlock {
   }
 
   @Override
-  public List<ItemStack> getDrops(BlockState p_220076_1_, LootContext.Builder p_220076_2_) {
-    BlockEntity tileentity = p_220076_2_.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
-    if (tileentity instanceof NetheriteShulkerBoxBlockEntity) {
-      NetheriteShulkerBoxBlockEntity shulkerboxtileentity = (NetheriteShulkerBoxBlockEntity) tileentity;
-      p_220076_2_ = p_220076_2_.withDynamicDrop(CONTENTS, (p_220168_1_, p_220168_2_) -> {
-        for (int i = 0; i < shulkerboxtileentity.getContainerSize(); ++i) {
-          p_220168_2_.accept(shulkerboxtileentity.getItem(i));
-        }
-
-      });
+  public List<ItemStack> getDrops(BlockState blockState, LootContext.Builder lootContext) {
+    BlockEntity blockEntity = lootContext.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
+    if (!(blockEntity instanceof NetheriteShulkerBoxBlockEntity shulkerBlockEntity)) {
+      return super.getDrops(blockState, lootContext);
     }
 
-    return super.getDrops(p_220076_1_, p_220076_2_);
+    lootContext = lootContext.withDynamicDrop(ShulkerBoxBlock.CONTENTS, (lootContext1, itemStackConsumer) -> {
+      for (int i = 0; i < shulkerBlockEntity.getContainerSize(); ++i) {
+        itemStackConsumer.accept(shulkerBlockEntity.getItem(i));
+      }
+    });
+
+    List<ItemStack> drops = super.getDrops(blockState, lootContext);
+
+    // TODO: use loot context instead
+    CompoundTag tileStackNbt = shulkerBlockEntity.getTileData().getCompound("PersistedItemNbt");
+
+    for (ItemStack drop : drops) {
+      if (!(drop.getItem() instanceof BlockItem blockItem)) {
+        continue;
+      }
+
+      if (!(blockItem.getBlock() instanceof NetheriteShulkerBoxBlock)) {
+        continue;
+      }
+
+      CompoundTag existingTag = drop.getTag();
+      if (existingTag == null) {
+        drop.setTag(tileStackNbt.copy());
+      } else {
+        drop.setTag(existingTag.merge(tileStackNbt));
+      }
+    }
+
+    return drops;
   }
 
   @Override
@@ -172,7 +194,6 @@ public class NetheriteShulkerBoxBlock extends BaseEntityBlock {
         ((NetheriteShulkerBoxBlockEntity) tileentity).setCustomName(p_180633_5_.getHoverName());
       }
     }
-
   }
 
   @Override
