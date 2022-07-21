@@ -1,19 +1,20 @@
 package be.ephys.netherite_shulkers;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.client.renderer.Atlases;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.model.ShulkerModel;
+import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.model.ShulkerModel;
-import net.minecraft.client.renderer.model.RenderMaterial;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3f;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -22,15 +23,16 @@ import net.minecraftforge.fml.common.Mod;
 
 @OnlyIn(Dist.CLIENT)
 @Mod.EventBusSubscriber(modid = NetheriteShulkers.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class NetheriteShulkerBoxTileEntityRenderer extends TileEntityRenderer<NetheriteShulkerBoxTileEntity> {
-  private static final ShulkerModel<?> SHULKER_MODEL = new ShulkerModel<>();
+public class NetheriteShulkerBoxTileEntityRenderer implements BlockEntityRenderer<NetheriteShulkerBoxBlockEntity> {
+  private final ShulkerModel<?> shulkerModel;
   public static final ResourceLocation NETHERITE_SHULKER_TEXTURE = NetheriteShulkers.id("model/netherite_shulker");
+  public static final Material NETHERITE_SHULKER_MATERIAL = new Material(Sheets.SHULKER_SHEET, NETHERITE_SHULKER_TEXTURE);
 
-  public NetheriteShulkerBoxTileEntityRenderer(TileEntityRendererDispatcher rendererDispatcher) {
-    super(rendererDispatcher);
+  public NetheriteShulkerBoxTileEntityRenderer(BlockEntityRendererProvider.Context context) {
+    this.shulkerModel = new ShulkerModel<>(context.bakeLayer(ModelLayers.SHULKER));
   }
 
-  public void render(NetheriteShulkerBoxTileEntity shulker, float tickTime, MatrixStack stack, IRenderTypeBuffer renderTypeBuffer, int lightColor, int overlay) {
+  public void render(NetheriteShulkerBoxBlockEntity shulker, float tickTime, PoseStack stack, MultiBufferSource renderTypeBuffer, int lightColor, int overlay) {
     if (!shulker.hasLevel()) {
       return;
     }
@@ -45,26 +47,26 @@ public class NetheriteShulkerBoxTileEntityRenderer extends TileEntityRenderer<Ne
     }
 
     Direction direction = blockstate.getValue(ShulkerBoxBlock.FACING);
-    RenderMaterial material = new RenderMaterial(Atlases.SHULKER_SHEET, NETHERITE_SHULKER_TEXTURE);
+    Material material = NETHERITE_SHULKER_MATERIAL;
 
     stack.pushPose();
     stack.translate(0.5D, 0.5D, 0.5D);
     float f = 0.9995F;
-    stack.scale(f, f, f);
+    stack.scale(0.9995F, 0.9995F, 0.9995F);
     stack.mulPose(direction.getRotation());
     stack.scale(1.0F, -1.0F, -1.0F);
     stack.translate(0.0D, -1.0D, 0.0D);
-    IVertexBuilder ivertexbuilder = material.buffer(renderTypeBuffer, RenderType::entityCutoutNoCull);
-    SHULKER_MODEL.getBase().render(stack, ivertexbuilder, lightColor, overlay);
-    stack.translate(0.0D, (-shulker.getProgress(tickTime) * 0.5F), 0.0D);
-    stack.mulPose(Vector3f.YP.rotationDegrees(270.0F * shulker.getProgress(tickTime)));
-    SHULKER_MODEL.getLid().render(stack, ivertexbuilder, lightColor, overlay);
+    ModelPart modelpart = this.shulkerModel.getLid();
+    modelpart.setPos(0.0F, 24.0F - shulker.getProgress(tickTime) * 0.5F * 16.0F, 0.0F);
+    modelpart.yRot = 270.0F * shulker.getProgress(tickTime) * ((float)Math.PI / 180F);
+    VertexConsumer vertexconsumer = material.buffer(renderTypeBuffer, RenderType::entityCutoutNoCull);
+    this.shulkerModel.renderToBuffer(stack, vertexconsumer, lightColor, overlay, 1.0F, 1.0F, 1.0F, 1.0F);
     stack.popPose();
   }
 
   @SubscribeEvent
   public static void onStitch(final TextureStitchEvent.Pre event) {
-    if (!event.getMap().location().equals(Atlases.SHULKER_SHEET)) {
+    if (!event.getAtlas().location().equals(Sheets.SHULKER_SHEET)) {
       return;
     }
 

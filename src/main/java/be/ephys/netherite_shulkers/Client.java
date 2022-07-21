@@ -1,11 +1,10 @@
 package be.ephys.netherite_shulkers;
 
-import net.minecraft.block.GrassBlock;
-import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
@@ -18,12 +17,12 @@ public class Client {
   }
 
   private static void setupClient(final FMLClientSetupEvent event) {
-    ClientRegistry.bindTileEntityRenderer(
+    BlockEntityRenderers.register(
       NetheriteShulkers.NETHERITE_SHULKER_BOX_TILE_ENTITY.get(),
       NetheriteShulkerBoxTileEntityRenderer::new
     );
 
-    ScreenManager.register(
+    MenuScreens.register(
       NetheriteShulkers.NETHERITE_SHULKER_BOX_CONTAINER.get(),
       NetheriteShulkerBoxScreen::new
     );

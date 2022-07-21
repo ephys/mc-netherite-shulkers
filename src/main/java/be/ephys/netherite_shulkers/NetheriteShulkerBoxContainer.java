@@ -1,29 +1,29 @@
 package be.ephys.netherite_shulkers;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ShulkerBoxSlot;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ShulkerBoxSlot;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
-public class NetheriteShulkerBoxContainer extends Container {
-  private final IInventory container;
+public class NetheriteShulkerBoxContainer extends AbstractContainerMenu {
+  private final Container container;
   private static final int SLOTS_PER_ROW = 9;
 
-  public NetheriteShulkerBoxContainer(int id, PlayerInventory playerInventory) {
-    this(id, playerInventory, new Inventory(NetheriteShulkerBoxTileEntity.INVENTORY_SIZE));
+  public NetheriteShulkerBoxContainer(int id, Inventory playerInventory) {
+    this(id, playerInventory, new SimpleContainer(NetheriteShulkerBoxBlockEntity.INVENTORY_SIZE));
   }
 
   public int getRowCount() {
-    return NetheriteShulkerBoxTileEntity.INVENTORY_SIZE / SLOTS_PER_ROW;
+    return NetheriteShulkerBoxBlockEntity.INVENTORY_SIZE / SLOTS_PER_ROW;
   }
 
-  public NetheriteShulkerBoxContainer(int id, PlayerInventory playerInventory, IInventory inventory) {
+  public NetheriteShulkerBoxContainer(int id, Inventory playerInventory, Container inventory) {
     super(NetheriteShulkers.NETHERITE_SHULKER_BOX_CONTAINER.get(), id);
-    checkContainerSize(inventory, NetheriteShulkerBoxTileEntity.INVENTORY_SIZE);
+    checkContainerSize(inventory, NetheriteShulkerBoxBlockEntity.INVENTORY_SIZE);
     this.container = inventory;
     inventory.startOpen(playerInventory.player);
 
@@ -75,11 +75,11 @@ public class NetheriteShulkerBoxContainer extends Container {
     }
   }
 
-  public boolean stillValid(PlayerEntity player) {
+  public boolean stillValid(Player player) {
     return this.container.stillValid(player);
   }
 
-  public ItemStack quickMoveStack(PlayerEntity player, int slotId) {
+  public ItemStack quickMoveStack(Player player, int slotId) {
     ItemStack itemstack = ItemStack.EMPTY;
     Slot slot = this.slots.get(slotId);
     if (slot != null && slot.hasItem()) {
@@ -103,7 +103,7 @@ public class NetheriteShulkerBoxContainer extends Container {
     return itemstack;
   }
 
-  public void removed(PlayerEntity player) {
+  public void removed(Player player) {
     super.removed(player);
     this.container.stopOpen(player);
   }

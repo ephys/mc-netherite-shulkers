@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[36,)"
+loaderVersion="[40,)"
 license="https://creativecommons.org/licenses/by-nc-sa/4.0/"
 #issueTrackerURL="https://change.me.to.your.issue.tracker.example.invalid/"
 [[mods]]
@@ -17,12 +17,12 @@ Shulkerboxes upgrade that increases inventory space and makes the shulkerbox imm
 [[dependencies.netherite_shulkers]]
     modId="forge"
     mandatory=true
-    versionRange="[36,)"
+    versionRange="[40,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.netherite_shulkers]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.5,1.17)"
+    versionRange="[1.18.2,1.19)"
     ordering="NONE"
     side="BOTH"
