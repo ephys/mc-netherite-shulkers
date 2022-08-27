@@ -12,7 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class ShulkerBoxSlotMixin {
   @Inject(method = "mayPlace", at = @At("RETURN"), cancellable = true)
   public void mayPlace$tagDenyList(ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
-    System.out.println("MAY PLACE");
     if (!cir.getReturnValue()) {
       return;
     }
