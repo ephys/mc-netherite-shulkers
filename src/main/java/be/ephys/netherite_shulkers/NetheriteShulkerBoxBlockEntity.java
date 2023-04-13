@@ -19,7 +19,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -71,11 +70,12 @@ public class NetheriteShulkerBoxBlockEntity extends RandomizableContainerBlockEn
       case OPENING:
         this.progress += 0.1F;
         if (this.progress >= 1.0F) {
-          this.moveCollidedEntities(level, pos, state);
           setAnimationStatus(level, pos, state, ShulkerBoxBlockEntity.AnimationStatus.OPENED);
           this.progress = 1.0F;
           doNeighborUpdates(level, pos, state);
         }
+
+        this.moveCollidedEntities(level, pos, state);
         break;
       case CLOSING:
         this.progress -= 0.1F;
@@ -96,12 +96,12 @@ public class NetheriteShulkerBoxBlockEntity extends RandomizableContainerBlockEn
   }
 
   public AABB getBoundingBox(BlockState blockState) {
-    return Shulker.getProgressAabb(blockState.getValue(ShulkerBoxBlock.FACING), 0.5F * this.getProgress(1.0F));
+    return Shulker.getProgressAabb(blockState.getValue(NetheriteShulkerBoxBlock.FACING), 0.5F * this.getProgress(1.0F));
   }
 
   private void moveCollidedEntities(Level p_155684_, BlockPos p_155685_, BlockState p_155686_) {
-    if (p_155686_.getBlock() instanceof ShulkerBoxBlock) {
-      Direction direction = p_155686_.getValue(ShulkerBoxBlock.FACING);
+    if (p_155686_.getBlock() instanceof NetheriteShulkerBoxBlock) {
+      Direction direction = p_155686_.getValue(NetheriteShulkerBoxBlock.FACING);
       AABB aabb = Shulker.getProgressDeltaAabb(direction, this.progressOld, this.progress).move(p_155685_);
       List<Entity> list = p_155684_.getEntities((Entity)null, aabb);
       if (!list.isEmpty()) {
