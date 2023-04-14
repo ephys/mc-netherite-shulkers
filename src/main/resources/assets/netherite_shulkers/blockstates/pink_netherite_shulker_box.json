@@ -1,0 +1,29 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "netherite_shulkers:block/pink_netherite_shulker_box",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "netherite_shulkers:block/pink_netherite_shulker_box",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "netherite_shulkers:block/pink_netherite_shulker_box",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "netherite_shulkers:block/pink_netherite_shulker_box",
+      "x": -90
+    },
+    "facing=up": {
+      "model": "netherite_shulkers:block/pink_netherite_shulker_box"
+    },
+    "facing=west": {
+      "model": "netherite_shulkers:block/pink_netherite_shulker_box",
+      "x": 90,
+      "y": -90
+    }
+  }
+}

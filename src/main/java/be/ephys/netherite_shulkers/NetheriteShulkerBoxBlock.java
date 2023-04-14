@@ -21,6 +21,7 @@ import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -54,9 +55,12 @@ public class NetheriteShulkerBoxBlock extends BaseEntityBlock {
   public static final EnumProperty<Direction> FACING = DirectionalBlock.FACING;
   public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
 
-  public NetheriteShulkerBoxBlock(Properties p_i48334_2_) {
-    super(p_i48334_2_);
+  @Nullable
+  private final DyeColor color;
 
+  public NetheriteShulkerBoxBlock(@Nullable DyeColor p_56188_, Properties p_i48334_2_) {
+    super(p_i48334_2_);
+    this.color = p_56188_;
     this.registerDefaultState(
       this.getStateDefinition().any()
         .setValue(OPEN, false)
@@ -127,21 +131,21 @@ public class NetheriteShulkerBoxBlock extends BaseEntityBlock {
 
   @Override
   public void playerWillDestroy(Level world, BlockPos pos, BlockState blockState, Player player) {
-    BlockEntity tileentity = world.getBlockEntity(pos);
-    if (tileentity instanceof NetheriteShulkerBoxBlockEntity) {
-      NetheriteShulkerBoxBlockEntity shulkerboxtileentity = (NetheriteShulkerBoxBlockEntity) tileentity;
-      if (!world.isClientSide && player.isCreative() && !shulkerboxtileentity.isEmpty()) {
-        ItemStack itemstack = new ItemStack(NetheriteShulkers.NETHERITE_SHULKER_BOX_ITEM.get());
-        shulkerboxtileentity.saveToItem(itemstack);
-        if (shulkerboxtileentity.hasCustomName()) {
-          itemstack.setHoverName(shulkerboxtileentity.getCustomName());
+    BlockEntity blockEntity = world.getBlockEntity(pos);
+
+    if (blockEntity instanceof NetheriteShulkerBoxBlockEntity shulkerBoxBlockEntity) {
+      if (!world.isClientSide && player.isCreative() && !shulkerBoxBlockEntity.isEmpty()) {
+        ItemStack itemstack = new ItemStack(getBlockByColor(this.color), 1);
+        shulkerBoxBlockEntity.saveToItem(itemstack);
+        if (shulkerBoxBlockEntity.hasCustomName()) {
+          itemstack.setHoverName(shulkerBoxBlockEntity.getCustomName());
         }
 
         ItemEntity itementity = new ItemEntity(world, (double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D, itemstack);
         itementity.setDefaultPickUpDelay();
         world.addFreshEntity(itementity);
       } else {
-        shulkerboxtileentity.unpackLootTable(player);
+        shulkerBoxBlockEntity.unpackLootTable(player);
       }
     }
 
@@ -285,5 +289,30 @@ public class NetheriteShulkerBoxBlock extends BaseEntityBlock {
   @Override
   public BlockState mirror(BlockState p_185471_1_, Mirror p_185471_2_) {
     return p_185471_1_.rotate(p_185471_2_.getRotation(p_185471_1_.getValue(FACING)));
+  }
+
+  public static Block getBlockByColor(@Nullable DyeColor color) {
+    if (color == null) {
+      return NetheriteShulkers.NETHERITE_SHULKER_BOX_BLOCK.get();
+    }
+
+    return switch (color) {
+      case WHITE -> NetheriteShulkers.WHITE_NETHERITE_SHULKER_BOX_BLOCK.get();
+      case ORANGE -> NetheriteShulkers.ORANGE_NETHERITE_SHULKER_BOX_BLOCK.get();
+      case MAGENTA -> NetheriteShulkers.MAGENTA_NETHERITE_SHULKER_BOX_BLOCK.get();
+      case LIGHT_BLUE -> NetheriteShulkers.LIGHT_BLUE_NETHERITE_SHULKER_BOX_BLOCK.get();
+      case YELLOW -> NetheriteShulkers.YELLOW_NETHERITE_SHULKER_BOX_BLOCK.get();
+      case LIME -> NetheriteShulkers.LIME_NETHERITE_SHULKER_BOX_BLOCK.get();
+      case PINK -> NetheriteShulkers.PINK_NETHERITE_SHULKER_BOX_BLOCK.get();
+      case GRAY -> NetheriteShulkers.GRAY_NETHERITE_SHULKER_BOX_BLOCK.get();
+      case LIGHT_GRAY -> NetheriteShulkers.LIGHT_GRAY_NETHERITE_SHULKER_BOX_BLOCK.get();
+      case CYAN -> NetheriteShulkers.CYAN_NETHERITE_SHULKER_BOX_BLOCK.get();
+      case PURPLE -> NetheriteShulkers.PURPLE_NETHERITE_SHULKER_BOX_BLOCK.get();
+      case BLUE -> NetheriteShulkers.BLUE_NETHERITE_SHULKER_BOX_BLOCK.get();
+      case BROWN -> NetheriteShulkers.BROWN_NETHERITE_SHULKER_BOX_BLOCK.get();
+      case GREEN -> NetheriteShulkers.GREEN_NETHERITE_SHULKER_BOX_BLOCK.get();
+      case RED -> NetheriteShulkers.RED_NETHERITE_SHULKER_BOX_BLOCK.get();
+      case BLACK -> NetheriteShulkers.BLACK_NETHERITE_SHULKER_BOX_BLOCK.get();
+    };
   }
 }

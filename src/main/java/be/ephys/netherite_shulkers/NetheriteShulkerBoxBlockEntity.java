@@ -35,7 +35,6 @@ import java.util.stream.IntStream;
 public class NetheriteShulkerBoxBlockEntity extends RandomizableContainerBlockEntity implements WorldlyContainer {
   public static final int INVENTORY_SIZE = 54;
 
-  public static final String ITEMS_TAG = "Items";
   private static final int[] SLOTS = IntStream.range(0, INVENTORY_SIZE).toArray();
   private NonNullList<ItemStack> itemStacks = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
   private int openCount;
