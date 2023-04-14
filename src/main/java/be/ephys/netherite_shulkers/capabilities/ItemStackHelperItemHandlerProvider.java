@@ -30,6 +30,6 @@ public class ItemStackHelperItemHandlerProvider implements ICapabilityProvider {
   }
 
   private IItemHandler createHandler() {
-    return new ItemStackHelperItemHandler(shulkerBoxItemStack, 27, 64);
+    return new ItemStackHelperItemHandler(shulkerBoxItemStack, 54, 64);
   }
 }
