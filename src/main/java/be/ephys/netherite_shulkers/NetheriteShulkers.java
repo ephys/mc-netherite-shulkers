@@ -4,7 +4,7 @@ import be.ephys.netherite_shulkers.capabilities.ItemStackHelperItemHandlerProvid
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -12,35 +12,36 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
-import net.minecraftforge.api.distmarker.Dist;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 @Mod(NetheriteShulkers.MODID)
+@net.minecraftforge.fml.common.Mod.EventBusSubscriber(
+  modid = NetheriteShulkers.MODID,
+  bus = net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus.MOD
+)
 public class NetheriteShulkers {
   public static final String MODID = "netherite_shulkers";
-  private static final Logger LOGGER = LogManager.getLogger();
 
   public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, NetheriteShulkers.MODID);
   public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, NetheriteShulkers.MODID);
-  public static final DeferredRegister<BlockEntityType<?>> TILE_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, NetheriteShulkers.MODID);
-  public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, NetheriteShulkers.MODID);
+  public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, NetheriteShulkers.MODID);
+  public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.MENU_TYPES, NetheriteShulkers.MODID);
 
   public static final RegistryObject<Block> NETHERITE_SHULKER_BOX_BLOCK = BLOCKS.register("netherite_shulker_box", () ->
     shulkerBox(
-      BlockBehaviour.Properties.of(Material.METAL, MaterialColor.COLOR_BLACK)
+      BlockBehaviour.Properties.of()
+        .mapColor(MapColor.COLOR_BLACK)
         .requiresCorrectToolForDrops()
         .strength(2.0F, 1200.0F)
         .dynamicShape()
@@ -66,33 +67,37 @@ public class NetheriteShulkers {
     new InvulnerableBlockItem(
       NETHERITE_SHULKER_BOX_BLOCK.get(),
       new Item.Properties()
-        .tab(CreativeModeTab.TAB_DECORATIONS)
         .fireResistant()
         .stacksTo(1)
     )
   );
 
-  public static final RegistryObject<BlockEntityType<NetheriteShulkerBoxBlockEntity>> NETHERITE_SHULKER_BOX_TILE_ENTITY = TILE_ENTITY_TYPES.register("netherite_shulker_box", () ->
+  public static final RegistryObject<BlockEntityType<NetheriteShulkerBoxBlockEntity>> NETHERITE_SHULKER_BOX_TILE_ENTITY = BLOCK_ENTITY_TYPES.register("netherite_shulker_box", () ->
     BlockEntityType.Builder.of(NetheriteShulkerBoxBlockEntity::new, NETHERITE_SHULKER_BOX_BLOCK.get()).build(null)
   );
 
-  public static final RegistryObject<MenuType<NetheriteShulkerBoxContainer>> NETHERITE_SHULKER_BOX_CONTAINER = CONTAINERS.register("netherite_shulker_box", () -> {
+  public static final RegistryObject<MenuType<NetheriteShulkerBoxContainer>> NETHERITE_SHULKER_BOX_CONTAINER = MENU_TYPES.register("netherite_shulker_box", () -> {
     return IForgeMenuType.create((pWindowID, pInventory, pData) -> {
       return new NetheriteShulkerBoxContainer(pWindowID, pInventory);
     });
   });
 
-  public NetheriteShulkers() {
-    IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+  public NetheriteShulkers(FMLJavaModLoadingContext context) {
+    IEventBus modEventBus = context.getModEventBus();
 
     BLOCKS.register(modEventBus);
     ITEMS.register(modEventBus);
-    TILE_ENTITY_TYPES.register(modEventBus);
-    CONTAINERS.register(modEventBus);
+    BLOCK_ENTITY_TYPES.register(modEventBus);
+    MENU_TYPES.register(modEventBus);
 
     MinecraftForge.EVENT_BUS.addGenericListener(ItemStack.class, NetheriteShulkers::onAttachItemStackCapabilities);
+  }
 
-    DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> Client::clientInit);
+  @SubscribeEvent
+  public static void onBuildContents(BuildCreativeModeTabContentsEvent event) {
+    if (event.getTabKey().equals(CreativeModeTabs.FUNCTIONAL_BLOCKS)) {
+      event.accept(NETHERITE_SHULKER_BOX_ITEM.get());
+    }
   }
 
   public static void onAttachItemStackCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
@@ -108,12 +113,12 @@ public class NetheriteShulkers {
     }
 
     event.addCapability(
-      new ResourceLocation(NetheriteShulkers.MODID, "shulker_box_item_handler_value"),
+      ResourceLocation.fromNamespaceAndPath(NetheriteShulkers.MODID, "shulker_box_item_handler_value"),
       new ItemStackHelperItemHandlerProvider(stack)
     );
   }
 
   public static ResourceLocation id(String id) {
-    return new ResourceLocation(NetheriteShulkers.MODID, id);
+    return ResourceLocation.fromNamespaceAndPath(NetheriteShulkers.MODID, id);
   }
 }

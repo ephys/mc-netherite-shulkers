@@ -17,15 +17,11 @@ import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
 @OnlyIn(Dist.CLIENT)
-@Mod.EventBusSubscriber(modid = NetheriteShulkers.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class NetheriteShulkerBoxTileEntityRenderer implements BlockEntityRenderer<NetheriteShulkerBoxBlockEntity> {
   private final ShulkerModel<?> shulkerModel;
-  public static final ResourceLocation NETHERITE_SHULKER_TEXTURE = NetheriteShulkers.id("model/netherite_shulker");
+  public static final ResourceLocation NETHERITE_SHULKER_TEXTURE = NetheriteShulkers.id("entity/netherite_shulker");
   public static final Material NETHERITE_SHULKER_MATERIAL = new Material(Sheets.SHULKER_SHEET, NETHERITE_SHULKER_TEXTURE);
 
   public NetheriteShulkerBoxTileEntityRenderer(BlockEntityRendererProvider.Context context) {
@@ -47,29 +43,19 @@ public class NetheriteShulkerBoxTileEntityRenderer implements BlockEntityRendere
     }
 
     Direction direction = blockstate.getValue(ShulkerBoxBlock.FACING);
-    Material material = NETHERITE_SHULKER_MATERIAL;
 
     stack.pushPose();
     stack.translate(0.5D, 0.5D, 0.5D);
-    float f = 0.9995F;
-    stack.scale(0.9995F, 0.9995F, 0.9995F);
+    float scale = 0.9995F;
+    stack.scale(scale, scale, scale);
     stack.mulPose(direction.getRotation());
     stack.scale(1.0F, -1.0F, -1.0F);
     stack.translate(0.0D, -1.0D, 0.0D);
     ModelPart modelpart = this.shulkerModel.getLid();
     modelpart.setPos(0.0F, 24.0F - shulker.getProgress(tickTime) * 0.5F * 16.0F, 0.0F);
     modelpart.yRot = 270.0F * shulker.getProgress(tickTime) * ((float)Math.PI / 180F);
-    VertexConsumer vertexconsumer = material.buffer(renderTypeBuffer, RenderType::entityCutoutNoCull);
+    VertexConsumer vertexconsumer = NETHERITE_SHULKER_MATERIAL.buffer(renderTypeBuffer, RenderType::entityCutoutNoCull);
     this.shulkerModel.renderToBuffer(stack, vertexconsumer, lightColor, overlay, 1.0F, 1.0F, 1.0F, 1.0F);
     stack.popPose();
-  }
-
-  @SubscribeEvent
-  public static void onStitch(final TextureStitchEvent.Pre event) {
-    if (!event.getAtlas().location().equals(Sheets.SHULKER_SHEET)) {
-      return;
-    }
-
-    event.addSprite(NETHERITE_SHULKER_TEXTURE);
   }
 }

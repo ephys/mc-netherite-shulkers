@@ -5,7 +5,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -35,7 +34,6 @@ import java.util.stream.IntStream;
 public class NetheriteShulkerBoxBlockEntity extends RandomizableContainerBlockEntity implements WorldlyContainer {
   public static final int INVENTORY_SIZE = 54;
 
-  public static final String ITEMS_TAG = "Items";
   private static final int[] SLOTS = IntStream.range(0, INVENTORY_SIZE).toArray();
   private NonNullList<ItemStack> itemStacks = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
   private int openCount;
@@ -171,7 +169,7 @@ public class NetheriteShulkerBoxBlockEntity extends RandomizableContainerBlockEn
   }
 
   protected Component getDefaultName() {
-    return new TranslatableComponent("block.netherite_shulkers.netherite_shulker_box");
+    return Component.translatable("block.netherite_shulkers.netherite_shulker_box");
   }
 
   public void load(CompoundTag p_155678_) {

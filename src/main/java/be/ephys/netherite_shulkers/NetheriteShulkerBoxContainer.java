@@ -33,19 +33,20 @@ public class NetheriteShulkerBoxContainer extends AbstractContainerMenu {
 
     for (int row = 0; row < rows; ++row) {
       for (int col = 0; col < SLOTS_PER_ROW; ++col) {
-
-        //                                         slot           x             y
         this.addSlot(new ShulkerBoxSlot(
           inventory,
+          // slot
           col + row * 9,
+          // x
           8 + col * 18,
+          // y
           FIRST_ROW_Y_OFFSET + row * 18
         ));
       }
     }
 
     int lastContainerRowY = FIRST_ROW_Y_OFFSET + (rows * 18);
-    int containerInventorySpacing = 13;
+    int containerInventorySpacing = 12;
 
     int playerInventoryRows = 3;
 
